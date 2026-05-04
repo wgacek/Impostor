@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Znajdź Impostora</title>
+<style>
+body {
+  font-family: Arial;
+  background: #0b1c2c;
+  color: white;
+  text-align: center;
+}
+.card {
+  background: #132f4c;
+  border-radius: 15px;
+  padding: 15px;
+  margin: 10px auto;
+  max-width: 420px;
+}
+input {
+  padding: 5px;
+  margin: 5px;
+  border-radius: 8px;
+  border: none;
+}
+button {
+  padding: 10px;
+  margin: 5px;
+  border-radius: 10px;
+  border: none;
+  background: #4cafef;
+  color: white;
+  cursor: pointer;
+}
+button:hover {
+  background: #3a9edc;
+}
+.hidden {
+  display: none;
+}
+</style>
+</head>
+<body>
+
+<h1>🎮 Znajdź Impostora</h1>
+
+<div class="card">
+  <h3>Nicki graczy</h3>
+  <div id="playersInputs"></div>
+  <button onclick="addPlayer()">➕ Dodaj gracza</button>
+</div>
+
+<div class="card">
+  <h3>Kategorie</h3>
+  <div id="categories"></div>
+</div>
+
+<button onclick="startGame()">🚀 Start</button>
+
+<div id="game" class="hidden">
+  <div class="card">
+    <h2 id="playerTurn"></h2>
+    <button onclick="showRole()">👁️ Pokaż rolę</button>
+    <button onclick="hideRole()">🙈 Ukryj rolę</button>
+    <p id="role"></p>
+    <button onclick="nextPlayer()">➡️ Dalej</button>
+  </div>
+</div>
+
+<script>
+
+const categoriesData = {
+
+"Życie codzienne":[
+{word:"Pizza",hint:"jedzenie"},
+{word:"Kawa",hint:"napój"},
+{word:"Telefon",hint:"urządzenie"},
+{word:"Szkoła",hint:"nauka"},
+{word:"Zakupy",hint:"sklep"},
+{word:"Samochód",hint:"transport"},
+{word:"Dom",hint:"mieszkanie"},
+{word:"Pieniądze",hint:"płatność"},
+{word:"Jedzenie",hint:"posiłek"},
+{word:"Sen",hint:"odpoczynek"}
+],
+
+"Życie społeczne":[
+{word:"Impreza",hint:"zabawa"},
+{word:"Plotki",hint:"rozmowy"},
+{word:"Randka",hint:"spotkanie"},
+{word:"Przyjaźń",hint:"relacja"},
+{word:"Kłótnia",hint:"konflikt"},
+{word:"Szef",hint:"praca"},
+{word:"Spotkanie",hint:"ludzie"},
+{word:"Rodzina",hint:"bliscy"},
+{word:"Związek",hint:"miłość"},
+{word:"Drama",hint:"emocje"}
+],
+
+"Podstawowe słowa":[
+{word:"Kot",hint:"zwierzę"},
+{word:"Pies",hint:"zwierzę"},
+{word:"Drzewo",hint:"roślina"},
+{word:"Woda",hint:"picie"},
+{word:"Ogień",hint:"gorąco"},
+{word:"Powietrze",hint:"oddech"},
+{word:"Kamień",hint:"twarde"},
+{word:"Słońce",hint:"światło"},
+{word:"Księżyc",hint:"noc"},
+{word:"Ziemia",hint:"planeta"}
+],
+
+"Ogólne":[
+{word:"Miłość",hint:"uczucie"},
+{word:"Strach",hint:"emocja"},
+{word:"Szczęście",hint:"radość"},
+{word:"Czas",hint:"zegarek"},
+{word:"Życie",hint:"istnienie"},
+{word:"Śmierć",hint:"koniec"},
+{word:"Prawda",hint:"fakt"},
+{word:"Kłamstwo",hint:"fałsz"},
+{word:"Los",hint:"przypadek"},
+{word:"Marzenie",hint:"sen"}
+],
+
+"Viral":[
+{word:"TikTok",hint:"aplikacja"},
+{word:"Influencer",hint:"internet"},
+{word:"Trend",hint:"moda"},
+{word:"Mem",hint:"śmieszne"},
+{word:"Hashtag",hint:"#"},
+{word:"Drama",hint:"konflikt"},
+{word:"Live",hint:"na żywo"},
+{word:"Follow",hint:"obserwuj"},
+{word:"Like",hint:"serce"},
+{word:"Komentarz",hint:"tekst"}
+],
+
+"Świat":[
+{word:"Polska",hint:"kraj"},
+{word:"USA",hint:"państwo"},
+{word:"Europa",hint:"kontynent"},
+{word:"Azja",hint:"kontynent"},
+{word:"Afryka",hint:"gorąco"},
+{word:"Ocean",hint:"woda"},
+{word:"Góry",hint:"wysoko"},
+{word:"Miasto",hint:"ludzie"},
+{word:"Wieś",hint:"spokój"},
+{word:"Pustynia",hint:"piasek"}
+],
+
+"Rozrywka":[
+{word:"Film",hint:"ekran"},
+{word:"Serial",hint:"odcinki"},
+{word:"Muzyka",hint:"dźwięk"},
+{word:"Koncert",hint:"scena"},
+{word:"Teatr",hint:"aktorzy"},
+{word:"Gra",hint:"zabawa"},
+{word:"YouTube",hint:"wideo"},
+{word:"Netflix",hint:"streaming"},
+{word:"Show",hint:"program"},
+{word:"Standup",hint:"komedia"}
+],
+
+"18+":[
+{word:"Pocałunek",hint:"usta"},
+{word:"Łóżko",hint:"sen"},
+{word:"Randka",hint:"para"},
+{word:"Noc",hint:"ciemno"},
+{word:"Dotyk",hint:"kontakt"},
+{word:"Flirt",hint:"zaloty"},
+{word:"Sekret",hint:"ukryte"},
+{word:"Fantazja",hint:"wyobraźnia"},
+{word:"Pokusa",hint:"chęć"},
+{word:"Zmysły",hint:"ciało"}
+],
+
+"Gry":[
+{word:"Minecraft",hint:"klocki"},
+{word:"Fortnite",hint:"battle royale"},
+{word:"CS",hint:"strzelanka"},
+{word:"RPG",hint:"postać"},
+{word:"FPS",hint:"strzelanie"},
+{word:"Level",hint:"poziom"},
+{word:"Boss",hint:"wróg"},
+{word:"Skin",hint:"wygląd"},
+{word:"Quest",hint:"zadanie"},
+{word:"Mapa",hint:"teren"}
+],
+
+"Filmy":[
+{word:"Titanic",hint:"statek"},
+{word:"Avatar",hint:"niebiescy"},
+{word:"Batman",hint:"bohater"},
+{word:"Joker",hint:"złoczyńca"},
+{word:"Matrix",hint:"symulacja"},
+{word:"Gladiator",hint:"arena"},
+{word:"Horror",hint:"strach"},
+{word:"Komedia",hint:"śmiech"},
+{word:"Akcja",hint:"walka"},
+{word:"Drama",hint:"emocje"}
+]
+
+};
+
+let players = [];
+let roles = [];
+let currentPlayer = 0;
+
+function addPlayer() {
+  let div = document.createElement("div");
+  div.innerHTML = `<input placeholder="Nick gracza">`;
+  document.getElementById("playersInputs").appendChild(div);
+}
+
+function loadCategories() {
+  let container = document.getElementById("categories");
+  for (let cat in categoriesData) {
+    container.innerHTML += `
+      <label>
+        <input type="checkbox" value="${cat}" checked> ${cat}
+      </label><br>`;
+  }
+}
+
+loadCategories();
+addPlayer(); addPlayer(); addPlayer();
+
+function startGame() {
+  players = [];
+
+  document.querySelectorAll("#playersInputs input").forEach(input => {
+    if (input.value.trim()) players.push(input.value.trim());
+  });
+
+  if (players.length < 3) {
+    alert("Minimum 3 graczy!");
+    return;
+  }
+
+  let selected = [];
+  document.querySelectorAll("#categories input:checked").forEach(c => {
+    selected.push(c.value);
+  });
+
+  if (selected.length === 0) {
+    alert("Wybierz kategorię!");
+    return;
+  }
+
+  let cat = selected[Math.floor(Math.random()*selected.length)];
+  let entry = categoriesData[cat][Math.floor(Math.random()*10)];
+
+  roles = players.map(() => entry.word);
+
+  let impostorIndex = Math.floor(Math.random()*players.length);
+  roles[impostorIndex] = "IMPOSTOR 🕵️\nPodpowiedź: " + entry.hint;
+
+  currentPlayer = 0;
+  document.getElementById("game").classList.remove("hidden");
+  updatePlayer();
+}
+
+function updatePlayer() {
+  document.getElementById("playerTurn").innerText = players[currentPlayer];
+  document.getElementById("role").innerText = "";
+}
+
+function showRole() {
+  document.getElementById("role").innerText = roles[currentPlayer];
+}
+
+function hideRole() {
+  document.getElementById("role").innerText = "❓";
+}
+
+function nextPlayer() {
+  currentPlayer++;
+  if (currentPlayer >= players.length) {
+    alert("Wszyscy zobaczyli role! Teraz gra 😈");
+    location.reload();
+  } else {
+    updatePlayer();
+  }
+}
+</script>
+
+</body>
+</html>

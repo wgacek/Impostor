@@ -50,11 +50,6 @@ button:hover {
   <button onclick="addPlayer()">➕ Dodaj gracza</button>
 </div>
 
-<div class="card">
-  <h3>Kategorie</h3>
-  <div id="categories"></div>
-</div>
-
 <button onclick="startGame()">🚀 Start</button>
 
 <div id="game" class="hidden">
@@ -69,139 +64,101 @@ button:hover {
 
 <script>
 
-const categoriesData = {
+const wordsData = [
 
-"Życie codzienne":[
-{word:"Pizza",hint:"jedzenie"},
-{word:"Kawa",hint:"napój"},
-{word:"Telefon",hint:"urządzenie"},
-{word:"Szkoła",hint:"nauka"},
-{word:"Zakupy",hint:"sklep"},
-{word:"Samochód",hint:"transport"},
-{word:"Dom",hint:"mieszkanie"},
-{word:"Pieniądze",hint:"płatność"},
-{word:"Jedzenie",hint:"posiłek"},
-{word:"Sen",hint:"odpoczynek"}
-],
+{word:"Krzesło",hint:"cztery nogi"},
+{word:"Stół",hint:"środek spotkań"},
+{word:"Okno",hint:"świat zewnętrzny"},
+{word:"Drzwi",hint:"zmiana miejsca"},
+{word:"Lampa",hint:"nocne światło"},
+{word:"Łóżko",hint:"utrata czasu"},
+{word:"Szafa",hint:"ukryte rzeczy"},
+{word:"Pilot",hint:"zdalna władza"},
+{word:"Telefon",hint:"ciągłe sprawdzanie"},
+{word:"Ładowarka",hint:"ostatnia nadzieja"},
 
-"Życie społeczne":[
-{word:"Impreza",hint:"zabawa"},
-{word:"Plotki",hint:"rozmowy"},
-{word:"Randka",hint:"spotkanie"},
-{word:"Przyjaźń",hint:"relacja"},
-{word:"Kłótnia",hint:"konflikt"},
-{word:"Szef",hint:"praca"},
-{word:"Spotkanie",hint:"ludzie"},
-{word:"Rodzina",hint:"bliscy"},
-{word:"Związek",hint:"miłość"},
-{word:"Drama",hint:"emocje"}
-],
+{word:"Samochód",hint:"cztery koła"},
+{word:"Rower",hint:"siła nóg"},
+{word:"Pociąg",hint:"stalowa droga"},
+{word:"Samolot",hint:"wysoka podróż"},
+{word:"Statek",hint:"woda długa"},
+{word:"Droga",hint:"kierunek ruchu"},
 
-"Podstawowe słowa":[
-{word:"Kot",hint:"zwierzę"},
-{word:"Pies",hint:"zwierzę"},
-{word:"Drzewo",hint:"roślina"},
-{word:"Woda",hint:"picie"},
-{word:"Ogień",hint:"gorąco"},
-{word:"Powietrze",hint:"oddech"},
-{word:"Kamień",hint:"twarde"},
-{word:"Słońce",hint:"światło"},
-{word:"Księżyc",hint:"noc"},
-{word:"Ziemia",hint:"planeta"}
-],
+{word:"Chleb",hint:"codzienny wybór"},
+{word:"Masło",hint:"gładka warstwa"},
+{word:"Ser",hint:"ciągnąca masa"},
+{word:"Jajko",hint:"krucha forma"},
+{word:"Makaron",hint:"splątana forma"},
+{word:"Ryż",hint:"małe ziarna"},
 
-"Ogólne":[
-{word:"Miłość",hint:"uczucie"},
-{word:"Strach",hint:"emocja"},
-{word:"Szczęście",hint:"radość"},
-{word:"Czas",hint:"zegarek"},
-{word:"Życie",hint:"istnienie"},
-{word:"Śmierć",hint:"koniec"},
-{word:"Prawda",hint:"fakt"},
-{word:"Kłamstwo",hint:"fałsz"},
-{word:"Los",hint:"przypadek"},
-{word:"Marzenie",hint:"sen"}
-],
+{word:"Jabłko",hint:"zakazany owoc"},
+{word:"Banan",hint:"śliska skórka"},
+{word:"Cytryna",hint:"kwaśna mina"},
+{word:"Winogrono",hint:"małe kule"},
+{word:"Truskawka",hint:"czerwone lato"},
 
-"Viral":[
-{word:"TikTok",hint:"aplikacja"},
-{word:"Influencer",hint:"internet"},
-{word:"Trend",hint:"moda"},
-{word:"Mem",hint:"śmieszne"},
-{word:"Hashtag",hint:"#"},
-{word:"Drama",hint:"konflikt"},
-{word:"Live",hint:"na żywo"},
-{word:"Follow",hint:"obserwuj"},
-{word:"Like",hint:"serce"},
-{word:"Komentarz",hint:"tekst"}
-],
+{word:"Kot",hint:"własne zasady"},
+{word:"Pies",hint:"wierny cień"},
+{word:"Koń",hint:"szybki ciężar"},
+{word:"Krowa",hint:"biały napój"},
+{word:"Wilk",hint:"nocne wycie"},
+{word:"Lis",hint:"cicha sztuczka"},
 
-"Świat":[
-{word:"Polska",hint:"kraj"},
-{word:"USA",hint:"państwo"},
-{word:"Europa",hint:"kontynent"},
-{word:"Azja",hint:"kontynent"},
-{word:"Afryka",hint:"gorąco"},
-{word:"Ocean",hint:"woda"},
-{word:"Góry",hint:"wysoko"},
-{word:"Miasto",hint:"ludzie"},
-{word:"Wieś",hint:"spokój"},
-{word:"Pustynia",hint:"piasek"}
-],
+{word:"Szkoła",hint:"długi obowiązek"},
+{word:"Zeszyt",hint:"puste kartki"},
+{word:"Długopis",hint:"nie zawsze działa"},
+{word:"Nauczyciel",hint:"trudne pytania"},
+{word:"Lekcja",hint:"wolny czas"},
 
-"Rozrywka":[
-{word:"Film",hint:"ekran"},
-{word:"Serial",hint:"odcinki"},
-{word:"Muzyka",hint:"dźwięk"},
-{word:"Koncert",hint:"scena"},
-{word:"Teatr",hint:"aktorzy"},
-{word:"Gra",hint:"zabawa"},
-{word:"YouTube",hint:"wideo"},
-{word:"Netflix",hint:"streaming"},
-{word:"Show",hint:"program"},
-{word:"Standup",hint:"komedia"}
-],
+{word:"Dom",hint:"bezpieczne miejsce"},
+{word:"Sklep",hint:"więcej rzeczy"},
+{word:"Szpital",hint:"niechciane miejsce"},
+{word:"Bank",hint:"cyfry rosną"},
+{word:"Apteka",hint:"gorzkie rozwiązania"},
 
-"18+":[
-{word:"Pocałunek",hint:"usta"},
-{word:"Łóżko",hint:"sen"},
-{word:"Randka",hint:"para"},
-{word:"Noc",hint:"ciemno"},
-{word:"Dotyk",hint:"kontakt"},
-{word:"Flirt",hint:"zaloty"},
-{word:"Sekret",hint:"ukryte"},
-{word:"Fantazja",hint:"wyobraźnia"},
-{word:"Pokusa",hint:"chęć"},
-{word:"Zmysły",hint:"ciało"}
-],
+{word:"Miłość",hint:"ślepy wybór"},
+{word:"Strach",hint:"zimne ręce"},
+{word:"Złość",hint:"nagły ogień"},
+{word:"Smutek",hint:"ciężka cisza"},
+{word:"Radość",hint:"krótki moment"},
 
-"Gry":[
-{word:"Minecraft",hint:"klocki"},
-{word:"Fortnite",hint:"battle royale"},
-{word:"CS",hint:"strzelanka"},
-{word:"RPG",hint:"postać"},
-{word:"FPS",hint:"strzelanie"},
-{word:"Level",hint:"poziom"},
-{word:"Boss",hint:"wróg"},
-{word:"Skin",hint:"wygląd"},
-{word:"Quest",hint:"zadanie"},
-{word:"Mapa",hint:"teren"}
-],
+{word:"Czas",hint:"ciągła ucieczka"},
+{word:"Noc",hint:"ciemna pora"},
+{word:"Rano",hint:"trudny start"},
+{word:"Wieczór",hint:"spokojny koniec"},
+{word:"Weekend",hint:"za krótki"},
 
-"Filmy":[
-{word:"Titanic",hint:"statek"},
-{word:"Avatar",hint:"niebiescy"},
-{word:"Batman",hint:"bohater"},
-{word:"Joker",hint:"złoczyńca"},
-{word:"Matrix",hint:"symulacja"},
-{word:"Gladiator",hint:"arena"},
-{word:"Horror",hint:"strach"},
-{word:"Komedia",hint:"śmiech"},
-{word:"Akcja",hint:"walka"},
-{word:"Drama",hint:"emocje"}
-]
+{word:"Film",hint:"fałszywa historia"},
+{word:"Muzyka",hint:"zmiana nastroju"},
+{word:"Gra",hint:"udana rywalizacja"},
+{word:"Kino",hint:"ciemna sala"},
+{word:"Koncert",hint:"żywy dźwięk"},
 
-};
+{word:"Książka",hint:"cichy świat"},
+{word:"Autor",hint:"twórca historii"},
+{word:"Strona",hint:"kolejny etap"},
+{word:"Gazeta",hint:"stare newsy"},
+
+{word:"Piłka",hint:"okrągły cel"},
+{word:"Mecz",hint:"walka punktów"},
+{word:"Drużyna",hint:"wspólny wynik"},
+{word:"Sędzia",hint:"ostatnie słowo"},
+
+{word:"Deszcz",hint:"mokry problem"},
+{word:"Śnieg",hint:"biała cisza"},
+{word:"Wiatr",hint:"niewidzialna siła"},
+{word:"Burza",hint:"głośne niebo"},
+{word:"Mgła",hint:"brak widoku"},
+
+{word:"Las",hint:"zielony chaos"},
+{word:"Rzeka",hint:"ciągły ruch"},
+{word:"Morze",hint:"bez końca"},
+{word:"Pustynia",hint:"sucha pustka"},
+{word:"Góra",hint:"wysoki trud"}
+
+];
+
+// ===== LOGIKA =====
 
 let players = [];
 let roles = [];
@@ -213,17 +170,6 @@ function addPlayer() {
   document.getElementById("playersInputs").appendChild(div);
 }
 
-function loadCategories() {
-  let container = document.getElementById("categories");
-  for (let cat in categoriesData) {
-    container.innerHTML += `
-      <label>
-        <input type="checkbox" value="${cat}" checked> ${cat}
-      </label><br>`;
-  }
-}
-
-loadCategories();
 addPlayer(); addPlayer(); addPlayer();
 
 function startGame() {
@@ -238,18 +184,7 @@ function startGame() {
     return;
   }
 
-  let selected = [];
-  document.querySelectorAll("#categories input:checked").forEach(c => {
-    selected.push(c.value);
-  });
-
-  if (selected.length === 0) {
-    alert("Wybierz kategorię!");
-    return;
-  }
-
-  let cat = selected[Math.floor(Math.random()*selected.length)];
-  let entry = categoriesData[cat][Math.floor(Math.random()*10)];
+  let entry = wordsData[Math.floor(Math.random()*wordsData.length)];
 
   roles = players.map(() => entry.word);
 
@@ -283,6 +218,7 @@ function nextPlayer() {
     updatePlayer();
   }
 }
+
 </script>
 
 </body>

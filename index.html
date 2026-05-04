@@ -17,7 +17,7 @@ body {
   margin: 10px auto;
   max-width: 420px;
 }
-input {
+input, select {
   padding: 5px;
   margin: 5px;
   border-radius: 8px;
@@ -32,9 +32,6 @@ button {
   color: white;
   cursor: pointer;
 }
-button:hover {
-  background: #3a9edc;
-}
 .hidden {
   display: none;
 }
@@ -43,6 +40,19 @@ button:hover {
 <body>
 
 <h1>🎮 Znajdź Impostora</h1>
+
+<div class="card">
+  <h3>Tryb gry</h3>
+  <select id="mode" onchange="toggleProMode()">
+    <option value="normal">Normalny</option>
+    <option value="pro">Pro (własne hasło)</option>
+  </select>
+
+  <div id="proInputs" class="hidden">
+    <input id="customWord" placeholder="Twoje hasło">
+    <input id="customHint" placeholder="Twój hint">
+  </div>
+</div>
 
 <div class="card">
   <h3>Nicki graczy</h3>
@@ -64,98 +74,21 @@ button:hover {
 
 <script>
 
+// ===== SŁOWA =====
 const wordsData = [
-
 {word:"Krzesło",hint:"cztery nogi"},
-{word:"Stół",hint:"środek spotkań"},
-{word:"Okno",hint:"świat zewnętrzny"},
-{word:"Drzwi",hint:"zmiana miejsca"},
-{word:"Lampa",hint:"nocne światło"},
-{word:"Łóżko",hint:"utrata czasu"},
-{word:"Szafa",hint:"ukryte rzeczy"},
-{word:"Pilot",hint:"zdalna władza"},
 {word:"Telefon",hint:"ciągłe sprawdzanie"},
-{word:"Ładowarka",hint:"ostatnia nadzieja"},
-
 {word:"Samochód",hint:"cztery koła"},
-{word:"Rower",hint:"siła nóg"},
-{word:"Pociąg",hint:"stalowa droga"},
-{word:"Samolot",hint:"wysoka podróż"},
-{word:"Statek",hint:"woda długa"},
-{word:"Droga",hint:"kierunek ruchu"},
-
-{word:"Chleb",hint:"codzienny wybór"},
-{word:"Masło",hint:"gładka warstwa"},
-{word:"Ser",hint:"ciągnąca masa"},
-{word:"Jajko",hint:"krucha forma"},
-{word:"Makaron",hint:"splątana forma"},
-{word:"Ryż",hint:"małe ziarna"},
-
-{word:"Jabłko",hint:"zakazany owoc"},
-{word:"Banan",hint:"śliska skórka"},
-{word:"Cytryna",hint:"kwaśna mina"},
-{word:"Winogrono",hint:"małe kule"},
-{word:"Truskawka",hint:"czerwone lato"},
-
 {word:"Kot",hint:"własne zasady"},
 {word:"Pies",hint:"wierny cień"},
-{word:"Koń",hint:"szybki ciężar"},
-{word:"Krowa",hint:"biały napój"},
-{word:"Wilk",hint:"nocne wycie"},
-{word:"Lis",hint:"cicha sztuczka"},
-
 {word:"Szkoła",hint:"długi obowiązek"},
-{word:"Zeszyt",hint:"puste kartki"},
-{word:"Długopis",hint:"nie zawsze działa"},
-{word:"Nauczyciel",hint:"trudne pytania"},
-{word:"Lekcja",hint:"wolny czas"},
-
 {word:"Dom",hint:"bezpieczne miejsce"},
-{word:"Sklep",hint:"więcej rzeczy"},
-{word:"Szpital",hint:"niechciane miejsce"},
-{word:"Bank",hint:"cyfry rosną"},
-{word:"Apteka",hint:"gorzkie rozwiązania"},
-
 {word:"Miłość",hint:"ślepy wybór"},
-{word:"Strach",hint:"zimne ręce"},
-{word:"Złość",hint:"nagły ogień"},
-{word:"Smutek",hint:"ciężka cisza"},
-{word:"Radość",hint:"krótki moment"},
-
 {word:"Czas",hint:"ciągła ucieczka"},
-{word:"Noc",hint:"ciemna pora"},
-{word:"Rano",hint:"trudny start"},
-{word:"Wieczór",hint:"spokojny koniec"},
-{word:"Weekend",hint:"za krótki"},
-
 {word:"Film",hint:"fałszywa historia"},
-{word:"Muzyka",hint:"zmiana nastroju"},
-{word:"Gra",hint:"udana rywalizacja"},
-{word:"Kino",hint:"ciemna sala"},
-{word:"Koncert",hint:"żywy dźwięk"},
-
-{word:"Książka",hint:"cichy świat"},
-{word:"Autor",hint:"twórca historii"},
-{word:"Strona",hint:"kolejny etap"},
-{word:"Gazeta",hint:"stare newsy"},
-
 {word:"Piłka",hint:"okrągły cel"},
-{word:"Mecz",hint:"walka punktów"},
-{word:"Drużyna",hint:"wspólny wynik"},
-{word:"Sędzia",hint:"ostatnie słowo"},
-
 {word:"Deszcz",hint:"mokry problem"},
-{word:"Śnieg",hint:"biała cisza"},
-{word:"Wiatr",hint:"niewidzialna siła"},
-{word:"Burza",hint:"głośne niebo"},
-{word:"Mgła",hint:"brak widoku"},
-
-{word:"Las",hint:"zielony chaos"},
-{word:"Rzeka",hint:"ciągły ruch"},
-{word:"Morze",hint:"bez końca"},
-{word:"Pustynia",hint:"sucha pustka"},
-{word:"Góra",hint:"wysoki trud"}
-
+{word:"Las",hint:"zielony chaos"}
 ];
 
 // ===== LOGIKA =====
@@ -163,6 +96,11 @@ const wordsData = [
 let players = [];
 let roles = [];
 let currentPlayer = 0;
+
+function toggleProMode() {
+  const mode = document.getElementById("mode").value;
+  document.getElementById("proInputs").classList.toggle("hidden", mode !== "pro");
+}
 
 function addPlayer() {
   let div = document.createElement("div");
@@ -184,7 +122,23 @@ function startGame() {
     return;
   }
 
-  let entry = wordsData[Math.floor(Math.random()*wordsData.length)];
+  let mode = document.getElementById("mode").value;
+  let entry;
+
+  if (mode === "pro") {
+    let word = document.getElementById("customWord").value.trim();
+    let hint = document.getElementById("customHint").value.trim();
+
+    if (!word || !hint) {
+      alert("Podaj hasło i hint!");
+      return;
+    }
+
+    entry = {word, hint};
+
+  } else {
+    entry = wordsData[Math.floor(Math.random()*wordsData.length)];
+  }
 
   roles = players.map(() => entry.word);
 
